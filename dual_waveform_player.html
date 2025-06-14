@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dual Waveform Player - Originals & Remixes</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/wavesurfer.js"></script>
+  <style>
+    body { background: #18181b; color: #fff; }
+    .neon { color: #00ffaa; text-shadow: 0 0 8px #00ffaa; }
+    .playlist-box { background: #23232b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem; }
+    .playlist-box h3 { color: #00ffaa; }
+    .playlist-list { min-height: 60px; }
+    .playlist-item { cursor: pointer; padding: 0.5rem; border-radius: 0.5rem; margin-bottom: 0.5rem; background: #222; transition: background 0.2s; }
+    .playlist-item:hover { background: #00ffaa33; }
+    .drag-over { border: 2px dashed #00ffaa; }
+    .waveform-container { margin-bottom: 2rem; }
+  </style>
+</head>
+<body class="p-4">
+  <h1 class="text-3xl font-bold neon mb-6 text-center">Dual Waveform Player</h1>
+  <div class="flex flex-col md:flex-row gap-8 justify-center">
+    <div class="playlist-box flex-1">
+      <h3 class="text-xl font-bold mb-2">🎵 Originals</h3>
+      <div id="originals-playlist" class="playlist-list" ondrop="handleDrop(event, 'originals')" ondragover="allowDrop(event)"></div>
+      <input type="file" id="originals-upload" accept="audio/*" multiple class="mt-2" onchange="handleFiles(this.files, 'originals')">
+    </div>
+    <div class="playlist-box flex-1">
+      <h3 class="text-xl font-bold mb-2">🎶 Remixes</h3>
+      <div id="remixes-playlist" class="playlist-list" ondrop="handleDrop(event, 'remixes')" ondragover="allowDrop(event)"></div>
+      <input type="file" id="remixes-upload" accept="audio/*" multiple class="mt-2" onchange="handleFiles(this.files, 'remixes')">
+    </div>
+  </div>
+
+  <div class="waveform-container">
+    <h2 class="text-lg neon mb-2">Original Track</h2>
+    <div id="waveform-original" class="rounded bg-gray-800 p-2"></div>
+  </div>
+  <div class="waveform-container">
+    <h2 class="text-lg neon mb-2">Remix Track</h2>
+    <div id="waveform-remix" class="rounded bg-gray-800 p-2"></div>
+  </div>
+
+  <div class="flex gap-4 justify-center mb-8">
+    <button onclick="playBoth()" class="bg-green-500 hover:bg-green-400 text-black font-bold py-2 px-4 rounded">Play Both</button>
+    <button onclick="pauseBoth()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-2 px-4 rounded">Pause Both</button>
+    <button onclick="stopBoth()" class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded">Stop Both</button>
+  </div>
+
+  <script>
+    let originals = [];
+    let remixes = [];
+    let originalPlayer = null;
+    let remixPlayer = null;
+    let currentOriginal = null;
+    let currentRemix = null;
+
+    function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+    function handleDrop(ev, type) {
+      ev.preventDefault();
+      ev.currentTarget.classList.remove('drag-over');
+      const files = ev.dataTransfer.files;
+      handleFiles(files, type);
+    }
+    function handleFiles(files, type) {
+      for (let file of files) {
+        const url = URL.createObjectURL(file);
+        const track = { name: file.name, url };
+        if (type === 'originals') {
+          originals.push(track);
+        } else {
+          remixes.push(track);
+        }
+      }
+      renderPlaylists();
+    }
+    function renderPlaylists() {
+      const origList = document.getElementById('originals-playlist');
+      const remixList = document.getElementById('remixes-playlist');
+      origList.innerHTML = '';
+      remixList.innerHTML = '';
+      originals.forEach((track, i) => {
+        const div = document.createElement('div');
+        div.className = 'playlist-item';
+        div.textContent = track.name;
+        div.onclick = () => loadTrack('original', i);
+        origList.appendChild(div);
+      });
+      remixes.forEach((track, i) => {
+        const div = document.createElement('div');
+        div.className = 'playlist-item';
+        div.textContent = track.name;
+        div.onclick = () => loadTrack('remix', i);
+        remixList.appendChild(div);
+      });
+    }
+    function loadTrack(type, idx) {
+      if (type === 'original') {
+        currentOriginal = originals[idx];
+        if (originalPlayer) originalPlayer.destroy();
+        originalPlayer = WaveSurfer.create({
+          container: '#waveform-original',
+          waveColor: '#00ffaa',
+          progressColor: '#fff',
+          height: 80,
+        });
+        originalPlayer.load(currentOriginal.url);
+      } else {
+        currentRemix = remixes[idx];
+        if (remixPlayer) remixPlayer.destroy();
+        remixPlayer = WaveSurfer.create({
+          container: '#waveform-remix',
+          waveColor: '#bb86fc',
+          progressColor: '#fff',
+          height: 80,
+        });
+        remixPlayer.load(currentRemix.url);
+      }
+    }
+    function playBoth() {
+      if (originalPlayer) originalPlayer.play();
+      if (remixPlayer) remixPlayer.play();
+    }
+    function pauseBoth() {
+      if (originalPlayer) originalPlayer.pause();
+      if (remixPlayer) remixPlayer.pause();
+    }
+    function stopBoth() {
+      if (originalPlayer) originalPlayer.stop();
+      if (remixPlayer) remixPlayer.stop();
+    }
+    // Initial render
+    renderPlaylists();
+  </script>
+</body>
+</html>
