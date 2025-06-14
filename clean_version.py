@@ -1,4 +1,5 @@
 # AI Whisper-based profanity cleaner
+<<<<<<< HEAD
 import os
 import tempfile
 from flask import Flask, request, jsonify, send_file
@@ -50,3 +51,5 @@ def clean_edit():
 
 if __name__ == '__main__':
     app.run(debug=True)
+=======
+>>>>>>> f20d66079c0ffbf3a4804ccd78579d90a64b01f4

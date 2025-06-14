@@ -168,6 +168,7 @@ masterForm.addEventListener('submit', (e) => {
   handleUpload(masterForm, '/api/master-track', masterStatus, 'Mastering your track...');
 });
 
+<<<<<<< HEAD
 // --- DUAL PLAYLIST & PLAYER LOGIC ---
 
 // Fetch playlists from backend (expects /api/playlists endpoint)
@@ -298,6 +299,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+=======
+>>>>>>> f20d66079c0ffbf3a4804ccd78579d90a64b01f4
 // Unlock Hard Drive (placeholder)
 function unlockHardDrive() {
   alert('Unlocking feature coming soon!');
