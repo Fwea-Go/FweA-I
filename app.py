@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, send_from_directory
 from whitenoise import WhiteNoise
 import os
@@ -120,4 +119,3 @@ def unlock_preview():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Render sets this automatically
     app.run(host="0.0.0.0", port=port, debug=True)
->>>>>>> f20d66079c0ffbf3a4804ccd78579d90a64b01f4
